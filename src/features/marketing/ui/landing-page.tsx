@@ -1,9 +1,9 @@
-import { Hero } from "./sections/hero";
+import { HeroSection } from "@/features/marketing/ui/components/sections/hero-section";
 
 export function LandingPage() {
   return (
-    <main>
-      <Hero />
-    </main>
+    <section>
+      <HeroSection />
+    </section>
   );
 }
