@@ -5,6 +5,7 @@ import { SolutionSection } from "./components/sections/solution-section";
 import { BenefitsSection } from "./components/sections/benefits-section";
 import { HowItWorksSection } from "./components/sections/how-it-works-section";
 import { FaqSection } from "./components/sections/faq-section";
+import { FinalCtaSection } from "./components/sections/final-cta-section";
 
 export function LandingPage() {
   return (
@@ -16,6 +17,7 @@ export function LandingPage() {
       <BenefitsSection />
       <HowItWorksSection />
       <FaqSection />
+      <FinalCtaSection />
     </section>
   );
 }
