@@ -1,13 +1,21 @@
+"use client";
+
+import { useRef } from "react";
 import { problemContent } from "@/features/marketing/content/problem";
 import { Container } from "../shared/container";
+import { useProblemCardsScroll } from "../../hooks/use-problem-cards-scroll";
 
 export function ProblemSection() {
   const { eyebrow, title, subtitle, items, highlight } = problemContent;
 
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  useProblemCardsScroll(sectionRef, { navOffset: 180 });
+
   return (
     <section
+      ref={sectionRef}
       id="problema"
-      aria-labelledby="problem-title"
       className="border-t border-border/60 py-16"
     >
       <Container>
@@ -38,20 +46,43 @@ export function ProblemSection() {
             </div>
           </header>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {items.map((item) => (
-              <article
-                key={item.title}
-                className="rounded-2xl border border-border/60 bg-background/40 p-5"
-              >
-                <h3 className="text-sm font-semibold text-foreground">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {item.description}
-                </p>
-              </article>
-            ))}
+          <div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
+              {items.map((item) => (
+                <article
+                  key={item.title}
+                  className="rounded-2xl border border-border/60 bg-background/40 p-5"
+                >
+                  <h3 className="text-sm font-semibold text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
+                </article>
+              ))}
+            </div>
+
+            <div className="relative hidden min-h-85 lg:block overflow-hidden">
+              {items.map((item, index) => (
+                <article
+                  key={item.title}
+                  data-problem-card
+                  style={{
+                    opacity: index === 0 ? 1 : 0,
+                    visibility: index === 0 ? "visible" : "hidden",
+                  }}
+                  className="absolute inset-0 transform-gpu will-change-[transform,opacity] rounded-2xl border border-border/60 bg-background/40 p-6"
+                >
+                  <h3 className="text-lg font-semibold text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-base text-muted-foreground">
+                    {item.description}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </Container>
