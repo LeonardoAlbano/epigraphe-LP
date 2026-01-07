@@ -1,5 +1,14 @@
+"use client";
+
 import { faqContent } from "@/features/marketing/content/faq";
 import { Container } from "../shared/container";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export function FaqSection() {
   const { eyebrow, title, subtitle, items } = faqContent;
@@ -28,20 +37,24 @@ export function FaqSection() {
           </p>
         </header>
 
-        <div className="mt-10 grid gap-4">
-          {items.map((item) => (
-            <article
-              key={item.question}
-              className="rounded-2xl border border-border/60 bg-card p-6"
-            >
-              <h3 className="text-sm font-semibold text-foreground">
-                {item.question}
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {item.answer}
-              </p>
-            </article>
-          ))}
+        <div className="mt-10">
+          <Accordion type="single" collapsible className="w-full">
+            {items.map((item) => (
+              <AccordionItem
+                key={item.question}
+                value={item.question}
+                className="border-b border-border/60"
+              >
+                <AccordionTrigger className="py-6 text-left text-base font-medium text-foreground hover:no-underline">
+                  {item.question}
+                </AccordionTrigger>
+
+                <AccordionContent className="pb-6 text-sm leading-relaxed text-muted-foreground">
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </Container>
     </section>
