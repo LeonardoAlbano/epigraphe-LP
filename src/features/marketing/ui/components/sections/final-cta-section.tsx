@@ -1,6 +1,8 @@
 import { finalCtaContent } from "@/features/marketing/content/final-cta";
 import { Container } from "../shared/container";
 
+import { Button } from "@/components/ui/button";
+
 export function FinalCtaSection() {
   const { eyebrow, title, subtitle, primaryAction, secondaryAction } =
     finalCtaContent;
@@ -9,10 +11,10 @@ export function FinalCtaSection() {
     <section
       id="contato"
       aria-labelledby="final-cta-title"
-      className="border-t border-border/60 bg-muted/40 py-20"
+      className="bg-muted/40 py-20"
     >
       <Container>
-        <div className="mx-auto max-w-2xl text-center space-y-6">
+        <div className="mx-auto max-w-2xl text-center space-y-6 pt-10">
           <p className="text-xs font-semibold tracking-widest text-muted-foreground">
             {eyebrow.toUpperCase()}
           </p>
@@ -28,22 +30,26 @@ export function FinalCtaSection() {
             {subtitle}
           </p>
 
-          <div className="flex flex-col items-center gap-3 pt-4 sm:flex-row sm:justify-center">
-            <a
-              href={primaryAction.href}
-              className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground"
-            >
-              {primaryAction.label}
-            </a>
+          <div className="flex flex-col items-center gap-3 pt-6 sm:flex-row sm:justify-center">
+            {/* Botão principal (CTA principal) */}
+            <Button asChild size="lg" className="rounded-xl px-8 font-medium">
+              <a href={primaryAction.href}>{primaryAction.label}</a>
+            </Button>
 
-            <a
-              href={secondaryAction.href}
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* Link secundário */}
+            <Button
+              asChild
+              variant="link"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
             >
-              {secondaryAction.label}
-            </a>
+              <a
+                href={secondaryAction.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {secondaryAction.label}
+              </a>
+            </Button>
           </div>
         </div>
       </Container>

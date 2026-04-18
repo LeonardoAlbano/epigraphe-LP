@@ -141,3 +141,8 @@
     transform: translate3d(-50%, 0, 0);
   }
 }
+
+/* Neon glow color — RGB values para uso em box-shadow com opacidade */
+:root {
+  --neon-rgb: 74 222 128; /* vivid green, compatível com o tema */
+}

@@ -12,9 +12,41 @@ type UseProjectsStackScrollOptions = {
   cardSelector: string;
   itemCount: number;
   minWidth?: number;
-  endPerItem?: number;
-  endMin?: number;
 };
+
+// Estados visuais das posições no deck
+const FRONT = {
+  x: 0, y: 0, opacity: 1,
+  rotateY: 0, rotateZ: 0, rotateX: 0,
+  z: 0, scale: 1,
+} as const;
+
+const ONE_BACK = {
+  x: 0, y: -20, opacity: 0.55,
+  rotateY: 0, rotateZ: 0, rotateX: -5,
+  z: -200, scale: 0.955,
+} as const;
+
+const TWO_BACK = {
+  x: 0, y: -40, opacity: 0.25,
+  rotateY: 0, rotateZ: 0, rotateX: -9,
+  z: -360, scale: 0.91,
+} as const;
+
+// Card ainda não revelado — entra pela direita (ímpar) ou esquerda (par)
+function hiddenState(index: number) {
+  const fromRight = index % 2 !== 0;
+  return {
+    x: fromRight ? 340 : -340,
+    y: 0,
+    opacity: 0,
+    rotateY: fromRight ? -15 : 15,
+    rotateZ: fromRight ? -1.6 : 1.6,
+    rotateX: 0,
+    z: -80,
+    scale: 1,
+  };
+}
 
 export function useProjectsStackScroll({
   sectionRef,
@@ -22,42 +54,20 @@ export function useProjectsStackScroll({
   cardSelector,
   itemCount,
   minWidth = 1024,
-  endPerItem = 650,
-  endMin = 1400,
 }: UseProjectsStackScrollOptions) {
   useLayoutEffect(() => {
     const sectionEl = sectionRef.current;
     const pinEl = pinRef.current;
-
     if (!sectionEl || !pinEl) return;
 
     const mm = gsap.matchMedia();
 
-    const ctx = gsap.context(() => {
-      mm.add(`(min-width: ${minWidth}px)`, () => {
+    mm.add(`(min-width: ${minWidth}px)`, () => {
+      const ctx = gsap.context(() => {
         const cards = gsap.utils.toArray<HTMLElement>(cardSelector);
-        if (cards.length === 0) return;
+        if (cards.length < 2) return;
 
-        const BASE_Y = -80;
-
-        const STACK = {
-          oneBack: {
-            y: BASE_Y - 26,
-            scale: 0.955,
-            opacity: 0.7,
-            z: -220,
-            rotateX: -6,
-            duration: 0.6,
-          },
-          twoBack: {
-            y: BASE_Y - 58,
-            scale: 0.92,
-            opacity: 0.45,
-            z: -360,
-            rotateX: -10,
-            duration: 0.6,
-          },
-        } as const;
+        const steps = cards.length - 1; // número de transições
 
         gsap.set(pinEl, { perspective: 1200 });
         gsap.set(cards, {
@@ -66,101 +76,52 @@ export function useProjectsStackScroll({
           willChange: "transform",
         });
 
-        cards.forEach((card, i) => {
-          gsap.set(card, {
-            x: i % 2 === 0 ? 260 : -260,
-            opacity: 0,
-            rotateY: i % 2 === 0 ? -14 : 14,
-            rotateZ: i % 2 === 0 ? -1.1 : 1.1,
-            z: -220,
-            y: BASE_Y,
-          });
-        });
+        // Card 0 começa visível; demais entram de lados alternados
+        gsap.set(cards[0], FRONT);
+        for (let i = 1; i < cards.length; i++) {
+          gsap.set(cards[i], hiddenState(i));
+        }
 
+        /**
+         * Cada step ocupa exatamente 1 unidade no timeline.
+         * Timeline total = `steps` unidades → snapTo: 1/steps
+         * alinha 100% com o início de cada transição.
+         */
         const tl = gsap.timeline({
-          defaults: { ease: "power4.out" },
+          defaults: { ease: "power2.inOut" },
           scrollTrigger: {
             trigger: sectionEl,
-            start: "top top",
-            end: `+=${Math.max(itemCount * endPerItem, endMin)}`,
+            start: "top top+=80",
+            end: `+=${steps * 100}vh`,
             scrub: 0.9,
             pin: pinEl,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
+            pinSpacing: true,
+            snap: {
+              snapTo: 1 / steps,
+              duration: { min: 0.2, max: 0.45 },
+              delay: 0.05,
+              ease: "power2.inOut",
+            },
           },
         });
 
-        cards.forEach((card, i) => {
-          tl.to(
-            card,
-            {
-              x: 24,
-              opacity: 1,
-              rotateY: 2,
-              rotateZ: 0.4,
-              z: -40,
-              duration: 0.75,
-            },
-            i
-          );
+        for (let i = 0; i < steps; i++) {
+          const curr = cards[i];
+          const next = cards[i + 1];
+          const prev = i > 0 ? cards[i - 1] : null;
 
-          tl.to(
-            card,
-            {
-              x: 0,
-              rotateY: 0,
-              rotateZ: 0,
-              z: 0,
-              duration: 0.35,
-              ease: "power3.out",
-            },
-            i + 0.72
-          );
+          // Todos os tweens deste step começam em `i` e duram 1 unidade
+          tl.to(next, { ...FRONT, duration: 1 }, i);
+          tl.to(curr, { ...ONE_BACK, duration: 1 }, i);
+          if (prev) tl.to(prev, { ...TWO_BACK, duration: 1 }, i);
+        }
+      }, sectionEl);
 
-          if (i > 0) {
-            tl.to(
-              cards[i - 1],
-              {
-                y: STACK.oneBack.y,
-                scale: STACK.oneBack.scale,
-                opacity: STACK.oneBack.opacity,
-                z: STACK.oneBack.z,
-                rotateX: STACK.oneBack.rotateX,
-                duration: STACK.oneBack.duration,
-                ease: "power2.out",
-              },
-              i
-            );
-          }
+      return () => ctx.revert();
+    });
 
-          if (i > 1) {
-            tl.to(
-              cards[i - 2],
-              {
-                y: STACK.twoBack.y,
-                scale: STACK.twoBack.scale,
-                opacity: STACK.twoBack.opacity,
-                z: STACK.twoBack.z,
-                rotateX: STACK.twoBack.rotateX,
-                duration: STACK.twoBack.duration,
-                ease: "power2.out",
-              },
-              i
-            );
-          }
-        });
-
-        return () => {
-          tl.kill();
-          ScrollTrigger.getAll().forEach((st) => {
-            if (st.trigger === sectionEl || st.pin === pinEl) st.kill();
-          });
-        };
-      });
-    }, sectionEl);
-
-    return () => {
-      ctx.revert();
-      mm.revert();
-    };
-  }, [sectionRef, pinRef, cardSelector, itemCount, minWidth, endPerItem, endMin]);
+    return () => mm.revert();
+  }, [sectionRef, pinRef, cardSelector, itemCount, minWidth]);
 }

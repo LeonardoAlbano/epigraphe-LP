@@ -8,6 +8,7 @@ import {
   type Project,
 } from "@/features/marketing/content/projects";
 import { Container } from "../shared/container";
+import { SectionBadge } from "../shared/section-badge";
 import { useProjectsStackScroll } from "@/features/marketing/ui/hooks/use-projects-stack-scroll";
 import { ProjectCard } from "./project-card";
 
@@ -27,13 +28,11 @@ export function ProjectsSection() {
       ref={sectionRef}
       id="projetos"
       aria-labelledby="projects-title"
-      className="border-t border-border pt-14"
+      className="border-t border-border pt-24 pb-0"
     >
       <Container>
         <header className="space-y-4">
-          <p className="text-xs font-semibold tracking-widest text-muted-foreground">
-            {projectsContent.eyebrow.toUpperCase()}
-          </p>
+          <SectionBadge label={projectsContent.eyebrow} variant="purple" />
 
           <h2
             id="projects-title"
@@ -53,8 +52,8 @@ export function ProjectsSection() {
           ))}
         </div>
 
-        <div ref={pinRef} className="mt-10 hidden lg:block">
-          <div className="relative h-[82vh]">
+        <div ref={pinRef} className="mt-12 hidden lg:block">
+          <div className="relative h-[66vh]">
             {projects.map((p: Project, idx: number) => (
               <div
                 key={p.slug}

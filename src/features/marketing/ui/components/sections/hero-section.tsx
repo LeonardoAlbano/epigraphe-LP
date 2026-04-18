@@ -31,28 +31,47 @@ export function HeroSection() {
             </header>
 
             <div className="flex flex-col gap-4 sm:flex-row">
-              <Button
-                asChild
-                size="lg"
-                className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <a href="https://wa.me/" target="_blank" rel="noreferrer">
-                  <MessageCircle size={20} />
-                  Falar no WhatsApp
-                </a>
-              </Button>
+              <div className="group relative w-full sm:w-auto">
+                <div className="pointer-events-none absolute inset-0 rounded-full bg-emerald-400/10 blur-xl transition-all duration-300 group-hover:bg-emerald-400/20 group-hover:blur-2xl" />
+                <div className="pointer-events-none absolute -inset-2 rounded-full bg-emerald-400/12 opacity-70 blur-2xl transition-all duration-300 group-hover:bg-emerald-400/20 group-hover:opacity-100" />
 
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="gap-2 bg-transparent hover:bg-muted"
-              >
-                <Link href="/cases">
-                  Ver cases
-                  <ArrowRight size={20} />
-                </Link>
-              </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  className="relative h-10 w-full rounded-full border border-white/10 bg-white/5 px-7 text-white backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-300/35 hover:bg-white/8 hover:shadow-[0_0_0_1px_rgba(52,211,153,0.12),0_0_32px_rgba(52,211,153,0.16)] sm:w-auto"
+                >
+                  <a href="https://wa.me/" target="_blank" rel="noreferrer">
+                    <span className="flex items-center gap-3">
+                      <MessageCircle
+                        size={20}
+                        className="text-white/90 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-200"
+                      />
+                      <span className="font-medium">Falar no WhatsApp</span>
+                    </span>
+                  </a>
+                </Button>
+              </div>
+
+              <div className="group relative w-full sm:w-auto">
+                <div className="pointer-events-none absolute inset-0 rounded-full bg-sky-400/8 blur-xl transition-all duration-300 group-hover:bg-sky-400/16 group-hover:blur-2xl" />
+                <div className="pointer-events-none absolute -inset-2 rounded-full bg-sky-400/10 opacity-60 blur-2xl transition-all duration-300 group-hover:bg-sky-400/18 group-hover:opacity-100" />
+
+                <Button
+                  asChild
+                  size="lg"
+                  className="relative h-10 w-full rounded-full border border-white/10 bg-white/5 px-7 text-white backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-300/35 hover:bg-white/8 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.12),0_0_32px_rgba(56,189,248,0.14)] sm:w-auto"
+                >
+                  <Link href="/cases">
+                    <span className="flex items-center gap-3">
+                      <span className="font-medium">Ver cases</span>
+                      <ArrowRight
+                        size={20}
+                        className="text-white/90 transition-all duration-300 group-hover:translate-x-1 group-hover:scale-110 group-hover:text-sky-200"
+                      />
+                    </span>
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
 

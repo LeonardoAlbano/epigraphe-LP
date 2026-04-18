@@ -4,7 +4,6 @@ import { useLayoutEffect, RefObject } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-
 gsap.registerPlugin(ScrollTrigger);
 
 type UseProblemCardsScrollOptions = {
@@ -17,69 +16,62 @@ export function useProblemCardsScroll(
   sectionRef: RefObject<HTMLElement | null>,
   options: UseProblemCardsScrollOptions = {}
 ) {
+  const {
+    minWidth = 1024,
+    navOffset = 80,
+    cardsSelector = "[data-problem-card]",
+  } = options;
+
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const {
-      minWidth = 1024,
-      navOffset = 180,
-      cardsSelector = "[data-problem-card]",
-    } = options;
 
     const mm = gsap.matchMedia();
 
     mm.add(`(min-width: ${minWidth}px)`, () => {
       const ctx = gsap.context(() => {
         const cards = gsap.utils.toArray<HTMLElement>(cardsSelector);
-        if (cards.length === 0) return;
+        if (cards.length < 2) return;
 
-        gsap.set(cards, { autoAlpha: 0, y: 24 });
+        const steps = cards.length - 1;
+
+        // Card 0 visível; demais ocultos abaixo (fora do overflow-hidden)
         gsap.set(cards[0], { autoAlpha: 1, y: 0 });
+        for (let i = 1; i < cards.length; i++) {
+          gsap.set(cards[i], { autoAlpha: 0, y: 56 });
+        }
 
-        const steps = Math.max(cards.length - 1, 1);
-
-        const pxPerStep = Math.round(
-          Math.min(620, Math.max(420, window.innerHeight * 0.7))
-        );
-
+        /**
+         * Timeline discreta: cada step ocupa exatamente 1 unidade.
+         * snapTo: 1/steps → alinha perfeitamente com cada transição.
+         * scrub alto (2) = resposta lenta e cinematográfica ao scroll.
+         */
         const tl = gsap.timeline({
+          defaults: { ease: "power2.inOut" },
           scrollTrigger: {
             trigger: section,
             start: `top top+=${navOffset}`,
-            end: () => `+=${steps * pxPerStep}`,
+            end: `+=${steps * 100}vh`,
             pin: true,
-            scrub: 1.1,
+            scrub: 2,
             anticipatePin: 1,
             invalidateOnRefresh: true,
-            snap:
-              cards.length > 1
-                ? {
-                    snapTo: 1 / (cards.length - 1),
-                    duration: { min: 0.18, max: 0.35 },
-                    delay: 0.12,
-                    ease: "power2.out",
-                  }
-                : undefined,
+            pinSpacing: true,
+            snap: {
+              snapTo: 1 / steps,
+              duration: { min: 0.5, max: 0.9 },
+              delay: 0.1,
+              ease: "power2.inOut",
+            },
           },
         });
 
-        for (let i = 1; i < cards.length; i++) {
-          const pos = i - 1;
-
-          tl.to(
-            cards[i - 1],
-            { autoAlpha: 0, y: -12, duration: 0.45, ease: "none" },
-            pos
-          );
-
-          tl.fromTo(
-            cards[i],
-            { autoAlpha: 0, y: 12 },
-            { autoAlpha: 1, y: 0, duration: 0.75, ease: "none" },
-            pos + 0.25
-          );
+        for (let i = 0; i < steps; i++) {
+          // Card atual sobe e some
+          tl.to(cards[i], { autoAlpha: 0, y: -48, duration: 1 }, i);
+          // Próximo card sobe do fundo
+          tl.to(cards[i + 1], { autoAlpha: 1, y: 0, duration: 1 }, i);
         }
 
         ScrollTrigger.refresh();
@@ -89,6 +81,5 @@ export function useProblemCardsScroll(
     });
 
     return () => mm.revert();
-  }, [sectionRef, options.minWidth, options.navOffset, options.cardsSelector, options]);
+  }, [sectionRef, minWidth, navOffset, cardsSelector]);
 }
-

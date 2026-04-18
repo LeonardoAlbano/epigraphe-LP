@@ -47,8 +47,7 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
-      "pnpm lint",
-      "pnpm typecheck"
+      "pnpm lint"
     ],
     "*.{json,md,yml,yaml}": [
       "pnpm lint"

@@ -2,6 +2,7 @@
 
 import { faqContent } from "@/features/marketing/content/faq";
 import { Container } from "../shared/container";
+import { SectionBadge } from "../shared/section-badge";
 
 import {
   Accordion,
@@ -17,13 +18,11 @@ export function FaqSection() {
     <section
       id="faq"
       aria-labelledby="faq-title"
-      className="border-t border-border/60 py-16"
+      className="border-t border-border/60 py-24"
     >
       <Container>
-        <header className="space-y-4">
-          <p className="text-xs font-semibold tracking-widest text-muted-foreground">
-            {eyebrow.toUpperCase()}
-          </p>
+        <header className="space-y-5">
+          <SectionBadge label={eyebrow} variant="cyan" />
 
           <h2
             id="faq-title"
@@ -32,7 +31,7 @@ export function FaqSection() {
             {title}
           </h2>
 
-          <p className="text-pretty text-base text-muted-foreground md:text-lg">
+          <p className="max-w-2xl text-pretty text-base text-muted-foreground md:text-lg">
             {subtitle}
           </p>
         </header>
